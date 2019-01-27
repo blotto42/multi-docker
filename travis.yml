@@ -1,0 +1,16 @@
+sudo: required
+services:
+  - docker
+
+before-install:
+  - docker build -t b10tt0/rect-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run b10tt0/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t b10tt0/multi-client ./client
+  - docker build -t b10tt0/multi-nginx ./nginx
+  - docker build -t b10tt0/multi-server ./server
+  - docker build -t b10tt0/multi-worker ./worker
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
